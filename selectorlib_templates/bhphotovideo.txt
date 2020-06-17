@@ -1,0 +1,6 @@
+price:
+    css: 'div[data-selenium="pricingPrice"]'
+    type: Text
+name:
+    css: 'h1[data-selenium="productTitle"]'
+    type: Text

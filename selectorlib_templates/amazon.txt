@@ -1,0 +1,6 @@
+price:
+    css: 'td.a-span12 span[id="priceblock_ourprice"]'
+    type: Text
+name:
+    css: 'div[id="titleSection"]'
+    type: Text

@@ -1,23 +1,21 @@
 ### REFERENCE DEV: https://googleapis.dev/python/firestore/latest/index.html
 
-from datetime import datetime
-
 # Local libs
 import config
 from src.setup import *
 import src.utils as utils
 
+# Libs
+import time
+from datetime import datetime
+import pandas as pd
+import requests
+from selectorlib import Extractor
+
 # Google Firebase
 import firebase_admin
 from firebase_admin import credentials, firestore, db
 
-# Name of the Collection (Table) in the database
-COLLECTION_ID_PRODUCTS = 'productos'
-
-# Name of the property
-FIELD_ID_WEBSITE   = 'notas'
-FIELD_ID_PRICE     = 'precio'
-FIELD_ID_WEIGHT    = 'pesoLb'
 
 TIMESTAMP = datetime.now().strftime("%Y%m%d_%H%M")
 
@@ -43,7 +41,7 @@ def create_local_copy_db():
     db = firestore.client()
 
     # Get specified collection
-    products_collection = db.collection(COLLECTION_ID_PRODUCTS)
+    products_collection = db.collection(config.COLLECTION_ID_PRODUCTS)
     docs = products_collection.stream()
     for doc in docs:
         data_dictionary[doc.id] = doc.to_dict()
@@ -52,22 +50,118 @@ def create_local_copy_db():
 
 def load_db_local_file(filename):
     try:
-        utils.load_json(filename)
+        print('Loading data from local file', filename)
+        return utils.load_json(filename)
     except Exception as e:
-        print(filename,'no se encuentra en la ruta especificada.')
+        print('No se encuentra en la ruta especificada', filename)
         print('Error:', e)
         return -1
 
+def create_excel_from_dictionary(data):
+    # Create Pandas DataFrame from dictionary
+    cols = ['uid']+config.cols_from_db+config.cols_analysis
+    df = pd.DataFrame()
+    for uid,document in data.items():
+        data_to_append = {}
+        data_to_append["uid"] = uid
+        for field,vals in document.items():
+            if field=="variaciones":
+                continue
+            if type(vals) == int:
+                data_to_append[field] = [vals]
+            else:
+                data_to_append[field] = vals
+        # Add data for processing
+        website = data[uid]["notas"]
+        data_to_append["websiteURL"] = website
+        data_to_append["selectorlib_plantilla"] = website[website.find('www.')+4 : website.find('.',website.find('www.')+4)] # Find website name, template must be the same name .txt
+        data_to_append["fechaUltimaActualizacion"] = datetime.now()
+        data_to_append["desactualizado"] = True
+
+        # Add variaciones multiple times at the end
+        if len(data[uid]["variaciones"])>0:
+            for variacion in data[uid]["variaciones"][0]:
+                data_to_append["variaciones"] = variacion
+                df = df.append(pd.DataFrame.from_dict(data_to_append), ignore_index=True)#print(data_to_append)
+        else:
+            data_to_append["variaciones"] = "No"
+            df = df.append(pd.DataFrame.from_dict(data_to_append), ignore_index=True)#print(data_to_append)
+    # Attach all the columns
+    df = pd.DataFrame(data = df, columns=cols)
+    df.to_excel(config.filename_excel_file+".xlsx")
+    # cache copy of db
+    df.to_excel(config.path_cache_db+"BD_COPY_"+TIMESTAMP+".xlsx")
+    return config.filename_excel_file+".xlsx"
+    
+
+def search_new_prices_webscrap(filename, only_outdated_entries=True, colOutdated="desactualizado"):
+    """
+    Iterates a dataframe and webscraps it based on conditions
+    """
+    # Load file
+    df = pd.read_excel(filename, engine="openpyxl")
+
+    # Filter only the entries to be updated
+    if only_outdated_entries:
+        isOutdated = df[colOutdated]==True
+
+    # Go through all the websites
+    total_to_process = df[isOutdated].shape[0]
+    processing_idx = 0
+    for index, row in df[isOutdated].iterrows():
+        processing_idx += 1
+        print("(", str(processing_idx),"|", str(total_to_process),") Procesando artículo: ", row["titulo"])
+
+        # Extract data from URL
+        website = row['websiteURL']
+        plantilla = row['selectorlib_plantilla']
+        r = requests.get(website)
+        e = Extractor.from_yaml_file(config.path_selectorlib_templates+plantilla+".txt")
+        if (r.status_code == requests.codes.ok):
+            # Success response from requests
+            result = e.extract(r.text)
+            price = None
+            try:
+                price = result["price"]
+                if(result["price"] is not None):
+                    row["precioNuevoEnWebsite"] = price
+                row["ResultadoWebscrap"] = str(result)
+            except Exception as e:
+                row["precioNuevoEnWebsite"] = ""
+                row["ResultadoWebscrap"] = e.message
+        else:
+            row["ResultadoWebscrap"] = r.text
+        row["fechaUltimaActualizacion"] = datetime.now()
+        row["desactualizado"] = False
+        print("\tResultado:",row["ResultadoWebscrap"])
+
+        # Grabar cambios del archivo a procesar nuevamente los datos
+        df.to_excel(config.filename_excel_file+".xlsx")
+
+        # SLEEP TO AVOID BAN FROM SERVERS
+        print("\tEsperando para evitar ban:",str(config.time_secs_between_transactions),"segundos...")
+        time.sleep(config.time_secs_between_transactions)
+
+
 def main():
+    ## DATA ANALYSIS
+    data = None
+    
+    # Download from server or load from file
     if(config.DESCARGAR_BD_DESDE_GOOGLE):
         data = create_local_copy_db()
         utils.create_json(data, json_path=config.path_local_db+config.filename_local_db+".json", indent=3)
         # Create a copy of the databse with timestamp
         utils.create_json(data, json_path=config.path_cache_db+config.filename_local_db+TIMESTAMP+".json")
     else:
-        load_db_local_file(config.path_local_db+config.filename_local_db+".json")
+        data = load_db_local_file(config.path_local_db+config.filename_local_db+".json")
+
+    if(config.CREAR_NUEVO_ARCHIVO_EXCEL):
+        create_excel_from_dictionary(data)
     
-    
+    if(config.BUSCAR_PRECIOS_NUEVOS):
+        search_new_prices_webscrap(config.filename_excel_file+".xlsx")
+
 
 # Entry point
 if __name__ == "__main__":

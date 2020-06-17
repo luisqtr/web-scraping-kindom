@@ -25,7 +25,8 @@ Después de instalar y configurar el proyecto, correr los siguientes comandos pa
 
 ## Manual de Usuario
 
-
+En el archivo de Excel, modificar a `TRUE` la columna `desactualizado` para intentar webscrapping en la página respectiva. El programa automáticamente coloca esta variable como `FALSE` incluso si el resultado falla. Para volver a intentar a recibir info de un articulo, se debe reactivar esta variable.
+La columna `selectorlib_plantilla` define el archivo de selectorlib que se usa para intentar extraer los datos de la página web.
 
 ___
 

@@ -1,13 +1,16 @@
 # VS CODE
 .vscode/
 
-# Databases
-database/*.json
-database/db_cache/*.json
-
 # DB private-key
 db_key/*.json
 db_key/*.csv
+
+# Databases
+database/*.json
+database/db_cache/*.json
+database/db_cache/*.xlsx
+
+BASE_DE_DATOS.xlsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
