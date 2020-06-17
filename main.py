@@ -88,9 +88,9 @@ def create_excel_from_dictionary(data):
             df = df.append(pd.DataFrame.from_dict(data_to_append), ignore_index=True)#print(data_to_append)
     # Attach all the columns
     df = pd.DataFrame(data = df, columns=cols)
-    df.to_excel(config.filename_excel_file+".xlsx")
+    df.to_excel(config.filename_excel_file+".xlsx", index=False)
     # cache copy of db
-    df.to_excel(config.path_cache_db+"BD_COPY_"+TIMESTAMP+".xlsx")
+    df.to_excel(config.path_cache_db+"BD_COPY_"+TIMESTAMP+".xlsx", index=False)
     return config.filename_excel_file+".xlsx"
     
 
@@ -101,20 +101,18 @@ def search_new_prices_webscrap(filename, only_outdated_entries=True, colOutdated
     # Load file
     df = pd.read_excel(filename, engine="openpyxl")
 
-    # Filter only the entries to be updated
-    if only_outdated_entries:
-        isOutdated = df[colOutdated]==True
-
     # Go through all the websites
-    total_to_process = df[isOutdated].shape[0]
-    processing_idx = 0
-    for index, row in df[isOutdated].iterrows():
-        processing_idx += 1
-        print("(", str(processing_idx),"|", str(total_to_process),") Procesando artículo: ", row["titulo"])
+    total_to_process = df.shape[0]
+    for i in range(total_to_process):    
+        print("(", str(i+1),"|", str(total_to_process),") Procesando artículo: ", df.loc[i,"titulo"], "con Variacion:", df.loc[i,"variaciones"])
+        # Filter only the entries to be updated
+        if (df.loc[i,'desactualizado'] == False):
+            print('\tDesactualizado=False, no se descargará info...')
+            continue
 
         # Extract data from URL
-        website = row['websiteURL']
-        plantilla = row['selectorlib_plantilla']
+        website = df.loc[i,'websiteURL']
+        plantilla = df.loc[i,'selectorlib_plantilla']
         r = requests.get(website)
         e = Extractor.from_yaml_file(config.path_selectorlib_templates+plantilla+".txt")
         if (r.status_code == requests.codes.ok):
@@ -124,23 +122,24 @@ def search_new_prices_webscrap(filename, only_outdated_entries=True, colOutdated
             try:
                 price = result["price"]
                 if(result["price"] is not None):
-                    row["precioNuevoEnWebsite"] = price
-                row["ResultadoWebscrap"] = str(result)
+                    df.loc[i,"precioNuevoEnWebsite"] = price
+                df.loc[i,"ResultadoWebscrap"] = str(result)
             except Exception as e:
-                row["precioNuevoEnWebsite"] = ""
-                row["ResultadoWebscrap"] = e.message
+                df.loc[i,"precioNuevoEnWebsite"] = ""
+                df.loc[i,"ResultadoWebscrap"] = e.message
         else:
-            row["ResultadoWebscrap"] = r.text
-        row["fechaUltimaActualizacion"] = datetime.now()
-        row["desactualizado"] = False
-        print("\tResultado:",row["ResultadoWebscrap"])
+            df.loc[i,"ResultadoWebscrap"] = r.text
+        df.loc[i,"fechaUltimaActualizacion"] = datetime.now()
+        df.loc[i,"desactualizado"] = False
+        print("\tResultado:",df.loc[i,"ResultadoWebscrap"])
 
         # Grabar cambios del archivo a procesar nuevamente los datos
-        df.to_excel(config.filename_excel_file+".xlsx")
+        df.to_excel(config.filename_excel_file+".xlsx", index=False)
 
         # SLEEP TO AVOID BAN FROM SERVERS
         print("\tEsperando para evitar ban:",str(config.time_secs_between_transactions),"segundos...")
         time.sleep(config.time_secs_between_transactions)
+    print("Terminado!")
 
 
 def main():
