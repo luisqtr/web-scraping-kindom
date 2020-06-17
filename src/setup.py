@@ -8,9 +8,6 @@ FIREBASE_KEYS_LIST = ["type", "project_id", "private_key_id", "private_key",
                 "client_email", "client_id", "auth_uri", "token_uri", 
                 "auth_provider_x509_cert_url", "client_x509_cert_url"]
 
-AMAZON_DB_KEY_EXT = ".csv"
-AMAZON_KEYS_LIST = ["AWSAccessKeyId", "AWSSecretKey"]
-
 #####################
 ######### FUNCTIONS
 #####################
@@ -39,35 +36,3 @@ def get_firebase_db_key(return_dict = False):
 
     print("Firebase database private key not found")
     return 1
-
-def get_amazon_keys(return_dict = False):
-    """
-    Returns the dict of the 
-    """
-    dict_file = None
-    for file in os.listdir(DB_KEY_FOLDER):
-        # Open files that are Json
-        if file.endswith(AMAZON_DB_KEY_EXT):
-            #try:          
-                with open(DB_KEY_FOLDER+file) as f:
-                    reader = csv.reader(f, delimiter = "=")
-                    dict_file = {row[0]:row[1] for row in reader }
-                    print(dict_file)
-                # If the dictionary is the same than the expected keys
-                if (AMAZON_KEYS_LIST == list(dict_file.keys())):
-                    print("Dictionary for Amazon was found from:", DB_KEY_FOLDER+file)
-                    if (return_dict):
-                        return dict_file
-                    else:
-                        return DB_KEY_FOLDER+file
-            #except:
-            #    continue
-
-    print("Firebase database private key not found")
-    return 1
-
-
-    AWSAccessKeyId=AKIAJZAU5Z2TUBYMAVCA
-    AWSSecretKey=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
-
-
