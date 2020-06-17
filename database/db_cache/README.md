@@ -1,0 +1,1 @@
+Cache for local copies of the DB from Firebase

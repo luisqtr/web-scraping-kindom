@@ -1,6 +1,10 @@
 # VS CODE
 .vscode/
 
+# Databases
+database/*.json
+database/db_cache/*.json
+
 # DB private-key
 db_key/*.json
 db_key/*.csv
