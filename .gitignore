@@ -2,8 +2,8 @@
 .vscode/
 
 # DB private-key
-db_key/luisquintero-67246-firebase-adminsdk-3mkhk-7dbd7ab130.json
-db_key/rootkey.csv
+db_key/*.json
+db_key/*.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

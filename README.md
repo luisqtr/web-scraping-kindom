@@ -33,8 +33,10 @@ ___
 
 Para conectar a la base de datos. En Firebase ir a *Project Settings > Service Accounts > Generate Private Key*, almacenar el .json en la carpeta `db_key/`
 
+Descargar `google-services.json` de Firebase para tener acceso a la API de la base de datos.
+
 La estructura de la base de datos en Firebase es `{collections, documents, fields}`, que asemeja la estructura `{tables, registries, fields}` de una base de datos relacional.
 
-En Amazon, crear una cuanta en [Amazon Web Services](https://aws.amazon.com/). Luego ir al `Perfil > My Security Credentials > Access keys > Create New Access Key > Download`, colocar el archivo en la carpeta `db_key/`.
+**NOT WORKING!!**
 
-AWS packages: https://github.com/yoavaviram/python-amazon-simple-product-api
+En Amazon, crear una cuanta en [Amazon Web Services](https://aws.amazon.com/). Luego ir al `Perfil > My Security Credentials > Access keys > Create New Access Key > Download`, colocar el archivo en la carpeta `db_key/`. AWS packages: https://github.com/yoavaviram/python-amazon-simple-product-api

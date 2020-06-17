@@ -2,4 +2,4 @@
 
 Agregar en esta carpeta el archivo Json con la llave privada creada desde Firebase.
 
-Modificar `amazon_key.py` con los datos de conexión de la cuenta de [AWS](http://aws.amazon.com)
+Descargar `google-services.json` desde Firebase>Project Overview>Android App. Este contiene la URL de la API.
