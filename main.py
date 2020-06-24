@@ -114,7 +114,7 @@ def search_new_prices_webscrap(filename, only_outdated_entries=True, colOutdated
         website = df.loc[i,'websiteURL']
         plantilla = df.loc[i,'selectorlib_plantilla']
         r = requests.get(website)
-        e = Extractor.from_yaml_file(config.path_selectorlib_templates+plantilla+".txt")
+        e = Extractor.from_yaml_file(config.path_selectorlib_templates+plantilla+".yml")
         if (r.status_code == requests.codes.ok):
             # Success response from requests
             result = e.extract(r.text)

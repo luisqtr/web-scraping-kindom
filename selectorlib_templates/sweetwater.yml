@@ -1,0 +1,8 @@
+price:
+    css: 'div.product-pricing div.product-price--final price'
+    xpath: null
+    type: Text
+name:
+    css: h1.product__name
+    xpath: null
+    type: Text

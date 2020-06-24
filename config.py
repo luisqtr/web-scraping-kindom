@@ -3,7 +3,7 @@
 DESCARGAR_BD_DESDE_GOOGLE = False
 
 # Crear archivo de Excel que resembla la base de datos
-CREAR_NUEVO_ARCHIVO_EXCEL = False
+CREAR_NUEVO_ARCHIVO_EXCEL = True
 
 # Ejecutar webscrap en todos los websites basado en archivo de Excel
 BUSCAR_PRECIOS_NUEVOS = True  
