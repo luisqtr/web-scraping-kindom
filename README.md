@@ -1,3 +1,6 @@
+# Webpages documentación Webscraping
+https://www.one-tab.com/page/wlSC-AXMQHSIdGkc8TJF7A
+
 # Conexión con Firebase DB
 
 ## Descripción
@@ -40,4 +43,4 @@ La estructura de la base de datos en Firebase es `{collections, documents, field
 
 **NOT WORKING!!**
 
-En Amazon, crear una cuanta en [Amazon Web Services](https://aws.amazon.com/). Luego ir al `Perfil > My Security Credentials > Access keys > Create New Access Key > Download`, colocar el archivo en la carpeta `db_key/`. AWS packages: https://github.com/yoavaviram/python-amazon-simple-product-api
+En Amazon, crear una cuenta en [Amazon Web Services](https://aws.amazon.com/). Luego ir al `Perfil > My Security Credentials > Access keys > Create New Access Key > Download`, colocar el archivo en la carpeta `db_key/`. AWS packages: https://github.com/yoavaviram/python-amazon-simple-product-api
