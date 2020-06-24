@@ -6,9 +6,9 @@ DESCARGAR_BD_DESDE_GOOGLE = False
 CREAR_NUEVO_ARCHIVO_EXCEL = False
 
 # Ejecutar webscrap en todos los websites basado en archivo de Excel
-BUSCAR_PRECIOS_NUEVOS = True
+BUSCAR_PRECIOS_NUEVOS = True  
 
-# CUIDADO!!!!
+# CUIDADO!!!!!!!!!!!!!!!!!
 #  Al activar esta variable modifica la BD final. 
 #  Pruebe primero de manera local que los cambios que desea hacer sean los correctos. 
 ACTUALIZAR_BD_A_GOOGLE = False

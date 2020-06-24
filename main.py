@@ -100,7 +100,7 @@ def search_new_prices_webscrap(filename, only_outdated_entries=True, colOutdated
     """
     # Load file
     df = pd.read_excel(filename, engine="openpyxl")
-
+    
     # Go through all the websites
     total_to_process = df.shape[0]
     for i in range(total_to_process):    
@@ -122,7 +122,7 @@ def search_new_prices_webscrap(filename, only_outdated_entries=True, colOutdated
             try:
                 price = result["price"]
                 if(result["price"] is not None):
-                    df.loc[i,"precioNuevoEnWebsite"] = price
+                    df.loc[i,"precioNuevoEnWebsite"] = price ## TODO: Format price as number and remove symbols and decimals
                 df.loc[i,"ResultadoWebscrap"] = str(result)
             except Exception as e:
                 df.loc[i,"precioNuevoEnWebsite"] = ""
@@ -141,6 +141,12 @@ def search_new_prices_webscrap(filename, only_outdated_entries=True, colOutdated
         time.sleep(config.time_secs_between_transactions)
     print("Terminado!")
 
+def send_updated_prices_to_db():
+    """
+    TODO:
+    Definir aquí los métodos para actualizar los datos de los productos en la BD de Firebase
+    """
+    pass
 
 def main():
     ## DATA ANALYSIS
@@ -161,6 +167,8 @@ def main():
     if(config.BUSCAR_PRECIOS_NUEVOS):
         search_new_prices_webscrap(config.filename_excel_file+".xlsx")
 
+    if(config.ACTUALIZAR_BD_A_GOOGLE):
+        send_updated_prices_to_db()
 
 # Entry point
 if __name__ == "__main__":
